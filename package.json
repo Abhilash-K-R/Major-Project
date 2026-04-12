@@ -1,0 +1,26 @@
+{
+  "name": "smart-hospital-queue-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-Based Smart Hospital Queue Prediction & Patient Arrival Optimization System",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev --workspace @smart-hospital/api",
+    "dev:web": "npm run dev --workspace @smart-hospital/web",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces",
+    "format": "npm run format --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=11.0.0"
+  }
+}

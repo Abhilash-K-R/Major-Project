@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AppointmentStatus {
+  BOOKED
+  CHECKED_IN
+  WAITING
+  IN_CONSULTATION
+  COMPLETED
+  CANCELLED
+}
+
+model Patient {
+  id           String        @id @default(cuid())
+  fullName     String
+  email        String        @unique
+  phoneNumber  String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String   @unique
+  role      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Doctor {
+  id                         String        @id @default(cuid())
+  fullName                   String
+  specialty                  String
+  roomNumber                 String
+  averageConsultationMinutes Int
+  isAvailable                Boolean       @default(true)
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+  appointments               Appointment[]
+}
+
+model Appointment {
+  id                String              @id @default(cuid())
+  patientId         String
+  doctorId          String
+  scheduledTime     DateTime
+  status            AppointmentStatus   @default(BOOKED)
+  queuePosition     Int?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  patient           Patient             @relation(fields: [patientId], references: [id])
+  doctor            Doctor              @relation(fields: [doctorId], references: [id])
+  queueEvents       QueueEvent[]
+  predictionHistory PredictionSnapshot[]
+}
+
+model QueueEvent {
+  id            String      @id @default(cuid())
+  appointmentId String
+  eventType     String
+  notes         String?
+  createdAt     DateTime    @default(now())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+model PredictionSnapshot {
+  id                       String      @id @default(cuid())
+  appointmentId            String
+  predictedWaitMinutes     Int
+  recommendedLeaveInMinute Int
+  confidence               String
+  createdAt                DateTime    @default(now())
+  appointment              Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+model Notification {
+  id               String   @id @default(cuid())
+  patientId        String
+  appointmentId    String
+  notificationType String
+  message          String
+  sentAt           DateTime?
+  createdAt        DateTime @default(now())
+}
